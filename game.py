@@ -71,6 +71,11 @@ class HumanPlayer(Player):
     def moveOrder(self, board, n):
         if self.order: return
 
+        def select(n):
+            piece = board.piece_at(n)
+            if piece and piece.color == self.color:
+                self.selected = n
+
         if self.selected is not None:
             order = SQUARE_NAMES[self.selected] + SQUARE_NAMES[n]
             if board.piece_at(self.selected).piece_type == PAWN and n // 8 == self.color * 7: # black = 0, white = 7
@@ -79,11 +84,9 @@ class HumanPlayer(Player):
                 self.order = order
                 self.selected = None
             else:
-                self.selected = None
+                select(n)
         else:
-            piece = board.piece_at(n)
-            if piece and piece.color == self.color:
-                self.selected = n
+            select(n)
 
     def move(self, board):
         _, self.legalMoves = board.toArrays()
