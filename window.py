@@ -1,6 +1,6 @@
 import tkinter as tk
 
-pieces = [' ', '♟', '♞', '♝', '♜', '♛', '♚', '♙', '♘', '♗', '♖', '♕', '♔']
+pieces = [' ', '♙', '♘', '♗', '♖', '♕', '♔', '♟', '♞', '♝', '♜', '♛', '♚']
 
 class Window:
     def __init__(self, onButton = None):
@@ -15,8 +15,8 @@ class Window:
 
         self.btns = [None] * 8*8
 
-        for x in range(0, 8):
-            for y in range(0, 8):
+        for x in range(8):
+            for y in range(8):
                 n = 8*8-1 - (x + y*8)
                 btn = tk.Label(frame,
                         text = ' ', font = ('Mono', 50),

@@ -1,40 +1,35 @@
 #!/usr/bin/env python
 
-from threading import Thread
-
-from window import Window
-from game import *
 import chess
+from window import Window
+from game import Game, HumanPlayer
+from ai import AIPlayer, compileNN
 
 def main():
 
+    model = compileNN()
+
     players = [
-        HumanPlayer(chess.BLACK),
-        HumanPlayer(chess.WHITE)
+        #HumanPlayer(chess.BLACK),
+        AIPlayer(color = chess.BLACK, model = model),
+        HumanPlayer(chess.WHITE),
     ]
     game = Game(*players)
-
-    running = True
-    def gameLoop():
-        while running:
-            game.run()
-            game.reset()
 
     def onBtn(n):
         p = players[game.turn]
         if isinstance(p, HumanPlayer):
             p.moveOrder(game, n)
 
+    def updateGame():
+        running = game.run()
+        win.update(game.toArrays()[0])
+
+        if not running:
+            game.reset()
+
     win = Window(onButton = onBtn)
-    thread = Thread(target = gameLoop)
-    thread.start()
-
-    win.loop(cb = lambda: win.update(game.toArray()))
-    running = False
-
-    for p in players:
-        if isinstance(p, HumanPlayer):
-            p.stop()
+    win.loop(cb = updateGame)
 
 if __name__ == "__main__":
     main()
