@@ -71,5 +71,5 @@ class AIPlayer(Player):
         if not self.lastMove or not self.lastBoardArray: return
 
         boardArray, legalMoves = board.toArrays()
-        futureQ = max([self.model.predict(self.getNNInput(boardArray, self.uciToN(a))) for a in legalMoves])
+        futureQ = max([self.model.predict(self.getNNInput(boardArray, self.uciToN(a))) for a in legalMoves] or [0])
         self.model.fit(self.getNNInput(self.lastBoardArray, self.uciToN(self.lastMove)), futureQ, verbose = 0)
