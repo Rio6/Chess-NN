@@ -43,9 +43,14 @@ class Game(Board):
 
         if not any(self.generate_legal_moves()) or self.can_claim_draw():
             # check/stale mate or draw
+            self.gameEnd()
             return False
 
         return True
+
+    def gameEnd(self):
+        for p in self.players:
+            p.gameEnd()
 
     def toArrays(self):
         builder = []
@@ -62,6 +67,8 @@ class Player:
     def move(self, board):
         pass
     def reward(self, board, reward):
+        pass
+    def gameEnd(self):
         pass
 
 

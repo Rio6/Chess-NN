@@ -17,21 +17,21 @@ weightFile = 'weight.h5'
 def buildModel():
     model = Sequential()
 
-    model.add(Conv2D(filters = 32, kernel_size = 5, strides = 2, padding = "same", input_shape = (3, 8, 8)))
+    model.add(Conv2D(filters = 32, kernel_size = 3, strides = 1, padding = "same", input_shape = (3, 8, 8)))
     model.add(BatchNormalization(axis = 1))
     model.add(Activation('relu'))
 
-    model.add(Conv2D(filters = 64, kernel_size = 3, strides = 1, padding = "same", input_shape = (3, 8, 8)))
+    model.add(Conv2D(filters = 64, kernel_size = 5, strides = 2, padding = "same", input_shape = (3, 8, 8)))
     model.add(BatchNormalization(axis = 1))
     model.add(Activation('relu'))
 
     model.add(Flatten())
 
-    model.add(Dense(768, activation = 'relu'))
+    model.add(Dense(512, activation = 'relu'))
     model.add(Dense(256, activation = 'relu'))
     model.add(Dense(1, activation = 'relu'))
 
-    adam = Adam(lr = 0.005, decay = 0)
+    adam = Adam(lr = 0.1e-4, decay = 0)
     model.compile(optimizer = adam, loss = 'mse')
     model.summary()
 
@@ -54,6 +54,9 @@ class AIPlayer(Player):
 
         self.lastBoardArray = None
         self.lastMove = None
+
+        self.memory = []
+        self.batchSize = 64
 
     def getNNInput(self, boardArray, move):
         board2d = np.reshape(boardArray, (8, 8)).astype('float')
@@ -101,7 +104,14 @@ class AIPlayer(Player):
             # factor in future rewards
             reward = (1-self.gamma) * reward + self.gamma * max([self.model.predict(self.getNNInput(boardArray, a))[0][0] for a in legalMoves])
 
-        if reward > 0: # see if ignoring 0s would do something
-            r = self.model.fit(self.getNNInput(self.lastBoardArray, self.lastMove), [reward], verbose = 0)
-            print("Learn  ", self.lastMove, reward, r.history['loss'][0])
-            plot.update(r.history['loss'])
+        #if reward > 0: # see if ignoring 0s would do something
+        #print("Learn  ", self.lastMove, reward)
+        self.memory.append((self.getNNInput(self.lastBoardArray, self.lastMove), [reward]))
+
+
+    def gameEnd(self):
+        if len(self.memory) < self.batchSize: return
+
+        trainData = random.sample(self.memory, self.batchSize)
+        loss = self.model.fit_generator((data for data in trainData), self.batchSize, verbose = 1).history['loss']
+        plot.update(loss)
