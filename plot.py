@@ -31,6 +31,7 @@ def makePlotWindow(upper):
     return (xList, yList)
 
 def update(x):
+    if plot is None or canvas is None: return
     xList.append(x)
     yList.append(datetime.now())
     plot.plot_date(yList, xList, 'b-')
