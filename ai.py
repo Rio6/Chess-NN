@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import random
 import re
@@ -8,7 +9,9 @@ from keras.layers import *
 import chess
 from game import Player
 
-def compileNN():
+weightFile = 'weight.h5'
+
+def buildModel():
     model = Sequential()
 
     for i in range(3):
@@ -24,13 +27,22 @@ def compileNN():
     model.compile(optimizer = 'adam', loss = 'mse')
     model.summary()
 
+    if os.path.isfile(weightFile):
+        print("Loading weight from", weightFile)
+        model.load_weights(weightFile)
+
     return model
 
+def saveModel(model):
+    print("Saving weight")
+    model.save(weightFile)
+
 class AIPlayer(Player):
-    def __init__(self, color, model, exploreRate = 0.2):
+    def __init__(self, color, model, exploreRate = 0.2, gamma = 0.995):
         self.color = color
         self.model = model 
         self.exploreRate = exploreRate
+        self.gamma = gamma
 
         self.lastBoardArray = None
         self.lastMove = None
@@ -71,5 +83,5 @@ class AIPlayer(Player):
         if not self.lastMove or not self.lastBoardArray: return
 
         boardArray, legalMoves = board.toArrays()
-        futureQ = max([self.model.predict(self.getNNInput(boardArray, self.uciToN(a))) for a in legalMoves] or [0])
-        self.model.fit(self.getNNInput(self.lastBoardArray, self.uciToN(self.lastMove)), futureQ, verbose = 0)
+        futureQ = max([self.model.predict(self.getNNInput(boardArray, self.uciToN(a)))[0] for a in legalMoves] or [0])
+        self.model.fit(self.getNNInput(self.lastBoardArray, self.uciToN(self.lastMove)), [(1-self.gamma) * reward + self.gamma * futureQ], verbose = 1)
