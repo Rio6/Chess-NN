@@ -29,7 +29,7 @@ def buildModel():
     model.add(Dense(256, activation = 'relu'))
     model.add(Dense(1, activation = 'relu'))
 
-    adam = Adam(lr = 0.8, decay = 0)
+    adam = Adam(lr = 0.005, decay = 0)
     model.compile(optimizer = adam, loss = 'mse')
     model.summary()
 
@@ -55,6 +55,14 @@ class AIPlayer(Player):
 
     def getNNInput(self, boardArray, move):
         board2d = np.reshape(boardArray, (8, 8)).astype('float')
+        if self.color == chess.BLACK:
+            # reverse board
+            # reverse board color
+            for i,j in np.ndindex(board2d.shape):
+                if board2d[i][j] > 0:
+                    board2d[i][j] = (board2d[i][j] + 6) % 12 or 12
+            # rotate the board
+            board2d = np.rot90(board2d, 2)
         board2d /= 13 # 12 pieces + empty
         from2d = np.zeros((8, 8))
         from2d[move[0]//8][move[0]%8] = 1
