@@ -38,7 +38,7 @@ def saveModel(model):
     model.save(weightFile)
 
 class AIPlayer(Player):
-    def __init__(self, color, model, exploreRate = 0.2, gamma = 0.995):
+    def __init__(self, color, model, exploreRate = 0.2, gamma = 0.9999):
         self.color = color
         self.model = model 
         self.exploreRate = exploreRate
@@ -76,6 +76,7 @@ class AIPlayer(Player):
             qs = [self.model.predict(self.getNNInput(boardArray, self.uciToN(a))) for a in legalMoves]
             maxQ = max(qs)
             self.lastMove = random.choice([legalMoves[i] for i in range(len(legalMoves)) if qs[i] == maxQ])
+            print("Getting", self.lastMove, maxQ)
 
         return self.lastMove
 
@@ -83,5 +84,10 @@ class AIPlayer(Player):
         if not self.lastMove or not self.lastBoardArray: return
 
         boardArray, legalMoves = board.toArrays()
-        futureQ = max([self.model.predict(self.getNNInput(boardArray, self.uciToN(a)))[0] for a in legalMoves] or [0])
-        self.model.fit(self.getNNInput(self.lastBoardArray, self.uciToN(self.lastMove)), [(1-self.gamma) * reward + self.gamma * futureQ], verbose = 1)
+
+        if len(legalMoves) > 0:
+            # factor in future rewards
+            reward = (1-self.gamma) * reward + self.gamma * max([self.model.predict(self.getNNInput(boardArray, self.uciToN(a)))[0] for a in legalMoves])
+
+        print("Learning", self.lastMove, reward)
+        self.model.fit(self.getNNInput(self.lastBoardArray, self.uciToN(self.lastMove)), [reward], verbose = 0)
