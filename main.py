@@ -47,6 +47,8 @@ def main():
         else:
             win = Window(onButton = onBtn)
             win.loop(cb = updateGame)
+    except KeyboardInterrupt:
+        pass
     finally:
         saveModel(model)
 
