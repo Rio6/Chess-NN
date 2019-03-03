@@ -30,9 +30,9 @@ class Window:
     def loop(self, cb = None):
         def cbLoop():
             cb()
-            self.root.after(100, cbLoop)
+            self.root.after(10, cbLoop)
         if cb:
-            self.root.after(100, cbLoop)
+            self.root.after(10, cbLoop)
         self.root.mainloop()
         self.finished = True
 
