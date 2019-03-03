@@ -35,21 +35,15 @@ class Game(Board):
         self.push(move)
         captured = self.captured # can_claim_draw() changes self.captured, so need to make a local copy
 
-        if not any(self.generate_legal_moves()):
-            p1.reward(self, 1)
-            p2.reward(self, -1)
-            return False
-
-        if self.can_claim_draw():
-            p1.reward(self, 0)
-            p2.reward(self, 0)
-            return False
-
         if captured:
             p1.reward(self, captured * 0.16)
             p2.reward(self, captured * -0.16)
         else:
             p2.reward(self, 0)
+
+        if not any(self.generate_legal_moves()) or self.can_claim_draw():
+            # check/stale mate or draw
+            return False
 
         return True
 

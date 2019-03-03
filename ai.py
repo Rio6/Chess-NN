@@ -15,10 +15,13 @@ weightFile = 'weight.h5'
 def buildModel():
     model = Sequential()
 
-    for i in range(5):
-        model.add(Conv2D(filters = 32, kernel_size = 3, strides = 1, padding = "same", input_shape = (3, 8, 8)))
-        model.add(BatchNormalization(axis = 1))
-        model.add(Activation('relu'))
+    model.add(Conv2D(filters = 32, kernel_size = 5, strides = 2, padding = "same", input_shape = (3, 8, 8)))
+    model.add(BatchNormalization(axis = 1))
+    model.add(Activation('relu'))
+
+    model.add(Conv2D(filters = 64, kernel_size = 3, strides = 1, padding = "same", input_shape = (3, 8, 8)))
+    model.add(BatchNormalization(axis = 1))
+    model.add(Activation('relu'))
 
     model.add(Flatten())
 
@@ -75,12 +78,13 @@ class AIPlayer(Player):
             qs = [self.model.predict(self.getNNInput(boardArray, a)) for a in legalMoves]
             maxQ = max(qs)
             self.lastMove = random.choice([legalMoves[i] for i in range(len(legalMoves)) if qs[i] == maxQ])
-            print("Getting ", self.lastMove, maxQ[0][0])
+            if maxQ[0][0] != 0: print("Getting ", self.lastMove, maxQ[0][0])
 
         return self.lastMove
 
     def reward(self, board, reward):
         if not self.lastMove or not self.lastBoardArray: return
+        if self.color: return # DEBUG
 
         boardArray, legalMoves = board.toArrays()
 
@@ -88,5 +92,6 @@ class AIPlayer(Player):
             # factor in future rewards
             reward = (1-self.gamma) * reward + self.gamma * max([self.model.predict(self.getNNInput(boardArray, a))[0][0] for a in legalMoves])
 
-        print("Learning", self.lastMove, reward)
-        self.model.fit(self.getNNInput(self.lastBoardArray, self.lastMove), [reward], verbose = 0)
+        if reward > 0:
+            print("Learning", self.lastMove, reward)
+            self.model.fit(self.getNNInput(self.lastBoardArray, self.lastMove), [reward], verbose = 0)
