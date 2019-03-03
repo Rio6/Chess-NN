@@ -1,4 +1,5 @@
 import tkinter as tk
+import plot
 
 pieces = [' ', '♙', '♘', '♗', '♖', '♕', '♔', '♟', '♞', '♝', '♜', '♛', '♚']
 
@@ -26,6 +27,8 @@ class Window:
                 btn.grid(column = x, row = y)
                 btn.bind('<Button-1>', lambda e,_n=n: onButton(_n))
                 self.btns[n] = btn
+
+        plot.makePlotWindow(self.root)
 
     def loop(self, cb = None):
         def cbLoop():
