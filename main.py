@@ -7,6 +7,8 @@ from window import Window
 from game import Game, HumanPlayer
 from ai import AIPlayer, buildModel, saveModel
 
+SAVE_INTERVAL = 5
+
 def main():
 
     model = buildModel()
@@ -29,6 +31,7 @@ def main():
     else:
         print("No command")
         quit(1)
+
     game = Game(*players)
 
     def onBtn(n):
@@ -41,8 +44,14 @@ def main():
         if not running:
             print("Game ended", game.result(claim_draw = True))
             game.reset()
+            updateGame.count += 1
 
         if win: win.update(game.toArrays()[0])
+
+        if updateGame.count >= SAVE_INTERVAL:
+            saveModel(model)
+            updateGame.count = 0
+    updateGame.count = 0
 
     win = None
     try:

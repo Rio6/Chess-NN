@@ -104,9 +104,9 @@ class AIPlayer(Player):
             # factor in future rewards
             reward = (1-self.gamma) * reward + self.gamma * max([self.model.predict(self.getNNInput(boardArray, a))[0][0] for a in legalMoves])
 
-        #if reward > 0: # see if ignoring 0s would do something
-        #print("Learn  ", self.lastMove, reward)
-        self.memory.append((self.getNNInput(self.lastBoardArray, self.lastMove), [reward]))
+        if reward > 0: # see if ignoring 0s would do something
+            #print("Learn  ", self.lastMove, reward)
+            self.memory.append((self.getNNInput(self.lastBoardArray, self.lastMove), [reward]))
 
 
     def gameEnd(self):

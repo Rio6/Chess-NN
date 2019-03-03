@@ -41,8 +41,14 @@ class Game(Board):
         else:
             p2.reward(self, 0)
 
-        if not any(self.generate_legal_moves()) or self.can_claim_draw():
-            # check/stale mate or draw
+        # check/stale mate or draw
+        if not any(self.generate_legal_moves()):
+            p1.reward(self, 1)
+            p2.reward(self, -1)
+            self.gameEnd()
+            return False
+
+        if self.can_claim_draw():
             self.gameEnd()
             return False
 
