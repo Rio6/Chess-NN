@@ -35,8 +35,8 @@ class Game(Board):
             return False
 
         if self.can_claim_draw():
-            p1.reward(self, .5)
-            p2.reward(self, .5)
+            p1.reward(self, 0)
+            p2.reward(self, 0)
             return False
 
         p2.reward(self, 0)

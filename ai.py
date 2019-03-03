@@ -76,7 +76,7 @@ class AIPlayer(Player):
             qs = [self.model.predict(self.getNNInput(boardArray, self.uciToN(a))) for a in legalMoves]
             maxQ = max(qs)
             self.lastMove = random.choice([legalMoves[i] for i in range(len(legalMoves)) if qs[i] == maxQ])
-            print("Getting", self.lastMove, maxQ)
+            print("Getting ", self.lastMove, maxQ[0][0])
 
         return self.lastMove
 
@@ -87,7 +87,7 @@ class AIPlayer(Player):
 
         if len(legalMoves) > 0:
             # factor in future rewards
-            reward = (1-self.gamma) * reward + self.gamma * max([self.model.predict(self.getNNInput(boardArray, self.uciToN(a)))[0] for a in legalMoves])
+            reward = (1-self.gamma) * reward + self.gamma * max([self.model.predict(self.getNNInput(boardArray, self.uciToN(a)))[0][0] for a in legalMoves])
 
         print("Learning", self.lastMove, reward)
         self.model.fit(self.getNNInput(self.lastBoardArray, self.uciToN(self.lastMove)), [reward], verbose = 0)
