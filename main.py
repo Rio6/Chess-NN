@@ -16,6 +16,11 @@ def main():
             AIPlayer(color = chess.BLACK, model = model),
             HumanPlayer(chess.WHITE)
         ]
+    elif 'debug' in sys.argv:
+        players = [
+            HumanPlayer(chess.BLACK),
+            HumanPlayer(chess.WHITE)
+        ]
     elif 'train' in sys.argv or 'watch' in sys.argv:
         players = [
             AIPlayer(color = chess.BLACK, model = model),
@@ -34,7 +39,7 @@ def main():
     def updateGame():
         running = game.run()
         if not running:
-            print("Game ended", game.result())
+            print("Game ended", game.result(claim_draw = True))
             game.reset()
 
         if win: win.update(game.toArrays()[0])

@@ -14,6 +14,10 @@ class Game(Board):
         super().__init__()
 
         self.players = [p2, p1] # black is False is 0
+        self.captured = None
+
+    def _push_capture(self, move, capture_square, piece_type, was_promoted):
+        self.captured = piece_type
 
     def run(self):
         if self.turn:
@@ -21,13 +25,15 @@ class Game(Board):
         else:
             p1, p2 = self.players[::-1]
 
-        move = Move.from_uci(p1.move(self))
+        move = Move(*p1.move(self))
 
         if move not in self.legal_moves:
             # Ignore invalid moves
             return True
 
+        self.captured = None
         self.push(move)
+        captured = self.captured # can_claim_draw() changes self.captured, so need to make a local copy
 
         if not any(self.generate_legal_moves()):
             p1.reward(self, 1)
@@ -39,7 +45,11 @@ class Game(Board):
             p2.reward(self, 0)
             return False
 
-        p2.reward(self, 0)
+        if captured:
+            p1.reward(self, captured * 0.16)
+            p2.reward(self, captured * -0.16)
+        else:
+            p2.reward(self, 0)
 
         return True
 
@@ -51,7 +61,7 @@ class Game(Board):
                 builder.append(piece.piece_type + (6 if piece.color == BLACK else 0))
             else:
                 builder.append(0)
-            moves = [m.uci() for m in self.legal_moves]
+            moves = [(m.from_square, m.to_square, m.promotion) for m in self.legal_moves]
         return (builder, moves)
 
 class Player:
@@ -77,9 +87,10 @@ class HumanPlayer(Player):
                 self.selected = n
 
         if self.selected is not None:
-            order = SQUARE_NAMES[self.selected] + SQUARE_NAMES[n]
+            promotion = None
             if board.piece_at(self.selected).piece_type == PAWN and n // 8 == self.color * 7: # black = 0, white = 7
-                order += 'q'
+                promotion = QUEEN
+            order = (self.selected, n, promotion)
             if order in self.legalMoves:
                 self.order = order
                 self.selected = None
@@ -92,7 +103,7 @@ class HumanPlayer(Player):
         _, self.legalMoves = board.toArrays()
         move = self.order
         self.order = None
-        return move or '0000'
+        return move or (0, 0)
 
     def reward(self, board, reward):
         print("Human reward", reward)
