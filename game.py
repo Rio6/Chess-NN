@@ -36,8 +36,9 @@ class Game(Board):
         captured = self.captured # can_claim_draw() changes self.captured, so need to make a local copy
 
         if captured:
-            p1.reward(self, captured * 0.16)
-            p2.reward(self, captured * -0.16)
+            reward = 0.15 * 1.3 ** captured
+            p1.reward(self, reward)
+            p2.reward(self, -reward)
         else:
             p2.reward(self, 0)
 
