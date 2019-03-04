@@ -25,13 +25,17 @@ def buildModel():
     model.add(BatchNormalization(axis = 1))
     model.add(Activation('relu'))
 
+    model.add(Conv2D(filters = 128, kernel_size = 5, strides = 2, padding = "same", input_shape = (3, 8, 8)))
+    model.add(BatchNormalization(axis = 1))
+    model.add(Activation('relu'))
+
     model.add(Flatten())
 
     model.add(Dense(512, activation = 'relu'))
     model.add(Dense(256, activation = 'relu'))
     model.add(Dense(1, activation = 'relu'))
 
-    adam = Adam(lr = 0.1e-4, decay = 0)
+    adam = Adam(lr = 0.1e-5, decay = 0)
     model.compile(optimizer = adam, loss = 'mse')
     model.summary()
 
