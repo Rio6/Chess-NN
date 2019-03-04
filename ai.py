@@ -2,6 +2,7 @@ import os
 import numpy as np
 import random
 import re
+from collections import deque
 
 from keras.models import Sequential
 from keras.layers import *
@@ -59,13 +60,12 @@ class AIPlayer(Player):
         self.lastBoardArray = None
         self.lastMove = None
 
-        self.memory = []
+        self.memory = deque(maxlen = 1024)
         self.batchSize = 64
 
     def getNNInput(self, boardArray, move):
         board2d = np.reshape(boardArray, (8, 8)).astype('float')
         if self.color == chess.BLACK:
-            # reverse board
             # reverse board color
             for i,j in np.ndindex(board2d.shape):
                 if board2d[i][j] > 0:
