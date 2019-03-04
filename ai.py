@@ -110,7 +110,7 @@ class AIPlayer(Player):
 
         if reward > 0: # see if ignoring 0s would do something
             #print("Learn  ", self.lastMove, reward)
-            self.memory.append((self.getNNInput(self.lastBoardArray, self.lastMove), [reward]))
+            self.memory.append((self.getNNInput(self.lastBoardArray, self.lastMove), np.array([reward])))
 
 
     def gameEnd(self):
