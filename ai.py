@@ -18,22 +18,24 @@ weightFile = 'weight.h5'
 def buildModel():
     model = Sequential()
 
-    model.add(Conv2D(filters = 32, kernel_size = 3, strides = 1, padding = "same", input_shape = (3, 8, 8)))
-    model.add(BatchNormalization(axis = 1))
-    model.add(Activation('relu'))
+    #model.add(Conv2D(filters = 32, kernel_size = 3, strides = 1, padding = "same", input_shape = (3, 8, 8)))
+    #model.add(BatchNormalization(axis = 1))
+    #model.add(Activation('relu'))
 
-    model.add(Conv2D(filters = 64, kernel_size = 5, strides = 2, padding = "same", input_shape = (3, 8, 8)))
-    model.add(BatchNormalization(axis = 1))
-    model.add(Activation('relu'))
+    #model.add(Conv2D(filters = 64, kernel_size = 5, strides = 2, padding = "same", input_shape = (3, 8, 8)))
+    #model.add(BatchNormalization(axis = 1))
+    #model.add(Activation('relu'))
 
-    model.add(Conv2D(filters = 128, kernel_size = 5, strides = 2, padding = "same", input_shape = (3, 8, 8)))
-    model.add(BatchNormalization(axis = 1))
-    model.add(Activation('relu'))
+    #model.add(Conv2D(filters = 128, kernel_size = 5, strides = 2, padding = "same", input_shape = (3, 8, 8)))
+    #model.add(BatchNormalization(axis = 1))
+    #model.add(Activation('relu'))
 
-    model.add(Flatten())
+    #model.add(Flatten())
 
-    model.add(Dense(512, activation = 'relu'))
-    model.add(Dense(256, activation = 'relu'))
+    model.add(Dense(192, input_shape = (3, 8, 8), activation = 'relu'))
+    model.add(Dense(384, activation = 'relu'))
+    model.add(Flatten());
+    model.add(Dense(384, activation = 'relu'))
     model.add(Dense(1, activation = 'relu'))
 
     adam = Adam(lr = 0.1e-5, decay = 0)
