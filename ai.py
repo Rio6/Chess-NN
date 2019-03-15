@@ -38,7 +38,7 @@ def buildModel():
     model.add(Dense(384, activation = 'relu'))
     model.add(Dense(1, activation = 'relu'))
 
-    adam = Adam(lr = 0.1e-5, decay = 0)
+    adam = Adam(lr = 0.1e-6, decay = 0)
     model.compile(optimizer = adam, loss = 'mse')
     model.summary()
 
@@ -110,7 +110,7 @@ class AIPlayer(Player):
             # factor in future rewards
             reward = (1-self.gamma) * reward + self.gamma * max([self.model.predict(self.getNNInput(boardArray, a))[0][0] for a in legalMoves])
 
-        if reward > 0: # see if ignoring 0s would do something
+        #if reward > 0: # see if ignoring 0s would do something
             #print("Learn  ", self.lastMove, reward)
             self.memory.append((self.getNNInput(self.lastBoardArray, self.lastMove), np.array([reward])))
 
@@ -119,5 +119,5 @@ class AIPlayer(Player):
         if len(self.memory) < self.batchSize: return
 
         trainData = random.sample(self.memory, self.batchSize)
-        loss = self.model.fit_generator((data for data in trainData), self.batchSize, verbose = 1).history['loss']
+        loss = self.model.fit_generator((d for d in trainData), self.batchSize, verbose = 1).history['loss']
         plot.update(loss)

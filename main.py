@@ -26,7 +26,7 @@ def main():
     elif 'train' in sys.argv or 'watch' in sys.argv:
         players = [
             AIPlayer(color = chess.BLACK, model = model),
-            AIPlayer(color = chess.WHITE, model = model),
+            AIPlayer(color = chess.WHITE, model = model)
         ]
     else:
         print("No command")
