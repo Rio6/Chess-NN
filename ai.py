@@ -7,6 +7,7 @@ from collections import deque
 from keras.models import Sequential
 from keras.layers import *
 from keras.optimizers import Adam
+import tensorflow as tf
 
 import chess
 from game import Player
@@ -16,26 +17,17 @@ import plot
 weightFile = 'weight.h5'
 
 def buildModel():
+    tf.Session(config=tf.ConfigProto(log_device_placement=True))
+
     model = Sequential()
-
-    #model.add(Conv2D(filters = 32, kernel_size = 3, strides = 1, padding = "same", input_shape = (3, 8, 8)))
-    #model.add(BatchNormalization(axis = 1))
-    #model.add(Activation('relu'))
-
-    #model.add(Conv2D(filters = 64, kernel_size = 5, strides = 2, padding = "same", input_shape = (3, 8, 8)))
-    #model.add(BatchNormalization(axis = 1))
-    #model.add(Activation('relu'))
-
-    #model.add(Conv2D(filters = 128, kernel_size = 5, strides = 2, padding = "same", input_shape = (3, 8, 8)))
-    #model.add(BatchNormalization(axis = 1))
-    #model.add(Activation('relu'))
-
-    #model.add(Flatten())
 
     model.add(Dense(192, input_shape = (3, 8, 8), activation = 'relu'))
     model.add(Dense(384, activation = 'relu'))
     model.add(Flatten());
+    model.add(Dense(768, activation = 'relu'))
+    model.add(Dense(768, activation = 'relu'))
     model.add(Dense(384, activation = 'relu'))
+    model.add(Dense(192, activation = 'relu'))
     model.add(Dense(1, activation = 'relu'))
 
     adam = Adam(lr = 0.1e-6, decay = 0)
@@ -96,8 +88,12 @@ class AIPlayer(Player):
         else:
             qs = [self.model.predict(self.getNNInput(boardArray, a)) for a in legalMoves]
             maxQ = max(qs)
-            self.lastMove = random.choice([legalMoves[i] for i in range(len(legalMoves)) if qs[i] == maxQ])
-            if maxQ[0][0] != 0: print("Getting", self.lastMove, maxQ[0][0])
+            if maxQ == 0:
+                # explore unknown moves
+                self.lastMove = random.choice(legalMoves)
+            else:
+                self.lastMove = random.choice([legalMoves[i] for i in range(len(legalMoves)) if qs[i] == maxQ])
+                print("Getting", self.lastMove, maxQ[0][0])
 
         return self.lastMove
 
